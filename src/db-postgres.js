@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-var Promise = require('promise');
-var pg = require('pg');
+var Promise = require("promise");
+var pg = require("pg");
 
-const initialize = connectionString => {
+const initialize = (connectionString) => {
   return new Promise((resolve, reject) => {
     pg.connect(connectionString, (err, client, done) => {
       if (err) {
@@ -11,9 +11,10 @@ const initialize = connectionString => {
         return reject();
       }
 
-      const CREATE_QUERY = 'CREATE TABLE IF NOT EXISTS members(id text PRIMARY KEY, created_at timestamp)';
+      const CREATE_QUERY =
+        "CREATE TABLE IF NOT EXISTS members(id text PRIMARY KEY, created_at timestamp)";
       var query = client.query(CREATE_QUERY);
-      query.on('end', () => {
+      query.on("end", () => {
         done();
         return resolve();
       });
@@ -21,8 +22,7 @@ const initialize = connectionString => {
   });
 };
 
-const putItem = connectionString => id => {
-
+const putItem = (connectionString) => (id) => {
   return new Promise((resolve, reject) => {
     pg.connect(connectionString, (err, client, done) => {
       if (err) {
@@ -30,17 +30,17 @@ const putItem = connectionString => id => {
         return reject();
       }
 
-      var query = client.query('INSERT INTO members VALUES($1, now())', [ id ]);
+      var query = client.query("INSERT INTO members VALUES($1, now())", [id]);
 
-      query.on('end', () => {
+      query.on("end", () => {
         done();
         return resolve();
       });
     });
   });
-}
+};
 
-const getItem = connectionString => id => {
+const getItem = (connectionString) => (id) => {
   return new Promise((resolve, reject) => {
     pg.connect(connectionString, (err, client, done) => {
       if (err) {
@@ -49,27 +49,25 @@ const getItem = connectionString => id => {
       }
 
       var results = [];
-      var query = client.query('SELECT * FROM members WHERE id=($1)', [id]);
+      var query = client.query("SELECT * FROM members WHERE id=($1)", [id]);
 
-      query.on('row', (row) => {
+      query.on("row", (row) => {
         results.push(row);
       });
 
-      query.on('end', () => {
+      query.on("end", () => {
         done();
         return resolve(results.length > 0 ? results[0] : null);
       });
     });
   });
-}
+};
 
 export default function (connectionString) {
-
   return initialize(connectionString).then(() => {
     return {
       put: putItem(connectionString),
-      get: getItem(connectionString)
-    }
+      get: getItem(connectionString),
+    };
   });
-
 }

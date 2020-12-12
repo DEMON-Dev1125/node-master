@@ -1,38 +1,38 @@
-'use strict';
+"use strict";
 
-import Promise from 'promise';
+import Promise from "promise";
 
 /*
 
 */
 export function parallel(items, fn) {
-  return Promise.all(items.map((item) => {
-    return new Promise((resolve, reject) => {
-      fn.call(null, item, (err, output) => {
-        if (err) {
-          reject()
-        }
-        else {
-          resolve(output)
-        }
+  return Promise.all(
+    items.map((item) => {
+      return new Promise((resolve, reject) => {
+        fn.call(null, item, (err, output) => {
+          if (err) {
+            reject();
+          } else {
+            resolve(output);
+          }
+        });
       });
-    });
-  }));
+    })
+  );
 }
 
 export function waterfall(...args) {
   let fns, initial;
   if (args.length === 1) {
     initial = 0;
-    fns = args[0]
-  }
-  else {
+    fns = args[0];
+  } else {
     initial = args[0];
     fns = args[1];
   }
 
-  if (!Array.isArray(fns) || !fns.every((fn) => typeof fn === 'function')) {
-    throw TypeError('functions should be an array of functions');
+  if (!Array.isArray(fns) || !fns.every((fn) => typeof fn === "function")) {
+    throw TypeError("functions should be an array of functions");
   }
 
   return new Promise((resolve, reject) => {
@@ -43,9 +43,8 @@ export function waterfall(...args) {
         return new Promise((success, fail) => {
           fn.call(null, res, (err, newRes) => {
             if (err) {
-              fail()
-            }
-            else {
+              fail();
+            } else {
               success(newRes);
             }
           });
